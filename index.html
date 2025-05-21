@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="vendors/css/normalize.css">
+        <link rel="stylesheet" type="text/css" href="vendors/css/grid.css">
+        <link rel="stylesheet" type="text/css" href="resources/css/style.css">
+        <link rel="stylesheet" type="text/css" href="resources/css/media-query.css">
+        <title>Workout Schedule Planner</title>
+    </head>
+    
+    <body>
+        <!-- HEAD -->
+        <header>
+            <div class="welcome">
+                <h1 class="main-text">Plan Your Workout <br class="break-main-text-1">and <br class="break-main-text-2">Count Calories</h1>
+                <div class="main-btn-container">
+                    <a href="#" class="btn main-btn js--scroll-to-schedule">Plan Workout Schedule</a>
+                    <a href="#" class="btn main-btn js--scroll-to-calories">Calculate Calories Today</a>
+                </div>
+                
+            </div>
+        </header>
+        <!-- SECTION 1 -->
+        <section class="section-schedule js--schedule">
+            <h1>About your Schedule?</h1>
+            <div class="muscle-checkboxes">
+                <input type="checkbox" id="Chest">  Chest<br>
+                <input type="checkbox" id="Back">   Back<br>
+                <input type="checkbox" id="Legs"> Legs<br>
+                <input type="checkbox" id="Shoulder"> Shoulder<br>
+                <input type="checkbox" id="Biceps"> Biceps<br>
+                <input type="checkbox" id="Triceps"> Triceps<br>
+                <input type="checkbox" id="Abs"> Abs<br>
+                
+                <p>First Day of Schedule<select id="firstday">
+                    <option value="Monday" selected>Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select></p>
+                
+                <button class="js--scroll-to-result" onclick=makeSchedule()>Create Workout Schedule</button>
+            </div>
+            
+            <div class="schedule-result js--schedule-result">
+                <h2>Here's Your Schedule</h2>
+                <p><strong>Monday:</strong><span id="Monday"></span><br>
+                    <strong>Tuesday:</strong><span id="Tuesday"></span><br>
+                    <strong>Wednesday:</strong><span id="Wednesday"></span><br>
+                    <strong>Thursday:</strong><span id="Thursday"></span><br>
+                    <strong>Friday:</strong><span id="Friday"></span><br>
+                    <strong>Saturday:</strong><span id="Saturday"></span><br>
+                    <strong>Sunday:</strong><span id="Sunday"></span><br>
+                </p>
+                <button onclick=makeSchedule() class="re-create">Re-Create</button>
+            </div>
+        </section>
+        <!-- SECTION 2 -->
+        <section class="section-calories js--calories">
+            
+            <h1>Calories Today?</h1>
+
+            <form class="cal-form">
+                <div class="input-calories">
+                    <h2>Menu: </h2><input type="text" id="food-name">
+                    <h2>Calories: </h2><input type="number" min="0" id="food-calories">
+                    <h2>Protein: </h2><input type="number" min="0" id="food-protein"><br>
+                    <button type="submit">Add Food</button>
+                    <button type="button" onclick=clearFood()>Clear</button>
+                    <p class="food-note"><span></span></p>
+                </div>
+            </form>
+            
+            <button id="calcal-btn" class="js--scroll-to-cal-cal" onclick=calCal()>Calculate Calories and Protein</button>
+            
+            <div class="cal-cal js--cal-cal">
+                <h2>All Calories <br class="break-menu-sum"><span id="all-calories"></span> Cals</h2>
+                <h2>All Protein <br class="break-menu-sum"><span id="all-protein"></span> Grams</h2>
+            </div>
+            
+        </section>
+        
+        <script src="resources/js/index.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="resources/js/scroll.js"></script>
+    
+    </body>
+    
+</html>
