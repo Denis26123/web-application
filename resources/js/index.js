@@ -1,6 +1,27 @@
+
 //------------------//
 // Schedule Section //
 //------------------//
+
+function saveProfile() {
+    const name = document.getElementById("username").value;
+    const age = document.getElementById("age").value;
+    const height = document.getElementById("height").value;
+    const weight = document.getElementById("weight").value;
+    const goal = document.getElementById("goal").value;
+
+    if (name && age && height && weight && goal) {
+        document.getElementById("res-username").textContent = name;
+        document.getElementById("res-age").textContent = age;
+        document.getElementById("res-height").textContent = height;
+        document.getElementById("res-weight").textContent = weight;
+        document.getElementById("res-goal").textContent = goal;
+
+        document.querySelector(".js--profile-result").style.display = "block";
+    } else {
+        alert("Please fill out all fields.");
+    }
+}
 
 let prev = ["mutable", "array"];
 

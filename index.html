@@ -13,6 +13,7 @@
     </head>
     
     <body>
+        
         <!-- HEAD -->
         <header>
             <div class="welcome">
@@ -25,6 +26,44 @@
             </div>
         </header>
         <!-- SECTION 1 -->
+         
+         <!-- SECTION: USER PROFILE -->
+
+<section class="section-profile js--profile">
+    <h1>Your Profile</h1>
+    <form class="profile-form">
+        <label for="username">Name:</label><br>
+        <input type="text" id="username" name="username"><br>
+
+        <label for="age">Age:</label><br>
+        <input type="number" id="age" name="age" min="1"><br>
+
+        <label for="height">Height (cm):</label><br>
+        <input type="number" id="height" name="height" min="0"><br>
+
+        <label for="weight">Weight (kg):</label><br>
+        <input type="number" id="weight" name="weight" min="0"><br>
+
+        <label for="goal">Fitness Goal:</label><br>
+        <select id="goal" name="goal">
+            <option value="gain">Gain Muscle</option>
+            <option value="lose">Lose Fat</option>
+            <option value="stay">Maintain</option>
+        </select><br><br>
+
+        <button type="button" onclick="saveProfile()">Save Profile</button>
+    </form>
+
+    <div class="profile-result js--profile-result" style="display: none;">
+        <h2>Profile Saved</h2>
+        <p><strong>Name:</strong> <span id="res-username"></span></p>
+        <p><strong>Age:</strong> <span id="res-age"></span></p>
+        <p><strong>Height:</strong> <span id="res-height"></span> cm</p>
+        <p><strong>Weight:</strong> <span id="res-weight"></span> kg</p>
+        <p><strong>Goal:</strong> <span id="res-goal"></span></p>
+    </div>
+</section>
+
         <section class="section-schedule js--schedule">
             <h1>About your Schedule?</h1>
             <div class="muscle-checkboxes">
