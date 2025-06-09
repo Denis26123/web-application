@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdfBlNOkb3z7o1ERMUHWWHiqsLrJVvVMg",
+      authDomain: "training-c1919.firebaseapp.com",
+      projectId: "training-c1919",
+      storageBucket: "training-c1919.appspot.com",
+      messagingSenderId: "537168879516",
+      appId: "1:537168879516:web:8639e7968434e7a5d8f259",
+      measurementId: "G-2X8WX08W7W"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.login = function () {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          window.location.href = "index.html"; // Перехід на головну
+        })
+        .catch(error => alert(error.message));
+    };
+
+    window.register = function () {
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          window.location.href = "index.html"; // Перехід після реєстрації
+        })
+        .catch(error => alert(error.message));
+    };
+
+    // Якщо вже авторизований — перенаправити на index.html
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</head>
+<body>
+  <h2>Увійти</h2>
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPassword" placeholder="Пароль">
+  <button onclick="login()">Увійти</button>
+
+  <h2>Або зареєструватися</h2>
+  <input type="email" id="registerEmail" placeholder="Email">
+  <input type="password" id="registerPassword" placeholder="Пароль">
+  <button onclick="register()">Реєстрація</button>
+</body>
+</html>
