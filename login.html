@@ -1,62 +1,213 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBdfBlNOkb3z7o1ERMUHWWHiqsLrJVvVMg",
-      authDomain: "training-c1919.firebaseapp.com",
-      projectId: "training-c1919",
-      storageBucket: "training-c1919.appspot.com",
-      messagingSenderId: "537168879516",
-      appId: "1:537168879516:web:8639e7968434e7a5d8f259",
-      measurementId: "G-2X8WX08W7W"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    window.login = function () {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          window.location.href = "index.html"; // Перехід на головну
-        })
-        .catch(error => alert(error.message));
-    };
-
-    window.register = function () {
-      const email = document.getElementById("registerEmail").value;
-      const password = document.getElementById("registerPassword").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          window.location.href = "index.html"; // Перехід після реєстрації
-        })
-        .catch(error => alert(error.message));
-    };
-
-    // Якщо вже авторизований — перенаправити на index.html
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        window.location.href = "index.html";
-      }
-    });
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизація</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="vendors/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="vendors/css/grid.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/style.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/media-query.css">
+    <style>
+        body {
+            font-family: 'Oswald', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            overflow: hidden;
+        }
+        .auth-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .auth-container h2 {
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .auth-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .auth-container input:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 8px rgba(24, 119, 242, 0.3);
+        }
+        .auth-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .auth-container button:hover {
+            background-color: #165ab8;
+            transform: translateY(-2px);
+        }
+        .auth-container button:active {
+            transform: translateY(0);
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin: 10px 0;
+            min-height: 20px;
+        }
+        .reset-password {
+            display: inline-block;
+            margin: 10px 0;
+            color: #1877f2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .reset-password:hover {
+            text-decoration: underline;
+        }
+        .section-divider {
+            margin: 1.5rem 0;
+            border-top: 1px solid #ddd;
+        }
+        @media (max-width: 480px) {
+            .auth-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h2>Увійти</h2>
-  <input type="email" id="loginEmail" placeholder="Email">
-  <input type="password" id="loginPassword" placeholder="Пароль">
-  <button onclick="login()">Увійти</button>
+    <div class="auth-container">
+        <h2>Увійти</h2>
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Пароль" required>
+        <button onclick="login()">Увійти</button>
+        <a href="#" class="reset-password" onclick="resetPassword()">Забули пароль?</a>
+        <div class="section-divider"></div>
+        <h2>Реєстрація</h2>
+        <input type="email" id="registerEmail" placeholder="Email" required>
+        <input type="password" id="registerPassword" placeholder="Пароль" required>
+        <button onclick="register()">Зареєструватися</button>
+        <p class="error" id="error-message"></p>
+    </div>
 
-  <h2>Або зареєструватися</h2>
-  <input type="email" id="registerEmail" placeholder="Email">
-  <input type="password" id="registerPassword" placeholder="Пароль">
-  <button onclick="register()">Реєстрація</button>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdfBlNOkb3z7o1ERMUHWWHiqsLrJVvVMg",
+            authDomain: "training-c1919.firebaseapp.com",
+            projectId: "training-c1919",
+            storageBucket: "training-c1919.appspot.com",
+            messagingSenderId: "537168879516",
+            appId: "1:537168879516:web:8639e7968434e7a5d8f259"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Вход
+        window.login = () => {
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
+            const errorMessage = document.getElementById("error-message");
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    console.log("Вхід успішний");
+                    window.location.href = "index.html";
+                })
+                .catch((error) => {
+                    errorMessage.textContent = error.message;
+                    if (error.code === "auth/invalid-credential") {
+                        errorMessage.textContent = "Неправильний email або пароль.";
+                    } else if (error.code === "auth/user-not-found") {
+                        errorMessage.textContent = "Користувача не знайдено.";
+                    } else if (error.code === "auth/wrong-password") {
+                        errorMessage.textContent = "Неправильний пароль.";
+                    }
+                });
+        };
+
+        // Регистрация
+        window.register = () => {
+            const email = document.getElementById("registerEmail").value;
+            const password = document.getElementById("registerPassword").value;
+            const errorMessage = document.getElementById("error-message");
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    console.log("Реєстрація успішна");
+                    window.location.href = "index.html";
+                })
+                .catch((error) => {
+                    errorMessage.textContent = error.message;
+                    if (error.code === "auth/email-already-in-use") {
+                        errorMessage.textContent = "Цей email уже зареєстровано.";
+                    } else if (error.code === "auth/invalid-email") {
+                        errorMessage.textContent = "Невірний формат email.";
+                    } else if (error.code === "auth/weak-password") {
+                        errorMessage.textContent = "Пароль занадто слабкий (мінімум 6 символів).";
+                    }
+                });
+        };
+
+        // Сброс пароля
+        window.resetPassword = () => {
+            const email = document.getElementById("loginEmail").value;
+            const errorMessage = document.getElementById("error-message");
+            if (!email) {
+                errorMessage.textContent = "Введіть email для скидання пароля.";
+                return;
+            }
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    errorMessage.textContent = "Лист для скидання пароля відправлено!";
+                })
+                .catch((error) => {
+                    errorMessage.textContent = error.message;
+                    if (error.code === "auth/invalid-email") {
+                        errorMessage.textContent = "Невірний формат email.";
+                    } else if (error.code === "auth/user-not-found") {
+                        errorMessage.textContent = "Користувача з таким email не знайдено.";
+                    }
+                });
+        };
+
+        // Если уже вошел — сразу на index.html
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                window.location.href = "index.html";
+            }
+        });
+    </script>
 </body>
 </html>

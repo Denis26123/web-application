@@ -4,6 +4,7 @@
 //------------------//
 
 function saveProfile() {
+    
     const name = document.getElementById("username").value;
     const age = document.getElementById("age").value;
     const height = document.getElementById("height").value;

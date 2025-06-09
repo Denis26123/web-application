@@ -14,24 +14,11 @@
 
 <body>
     <!-- Авторизация -->
-    <div id="auth-block">
-        <h2>Увійти</h2>
-        <input type="email" id="loginEmail" placeholder="Email">
-        <input type="password" id="loginPassword" placeholder="Пароль">
-        <button onclick="login()">Увійти</button>
-
-        <h2>Регістрація</h2>
-        <input type="email" id="registerEmail" placeholder="Email">
-        <input type="password" id="registerPassword" placeholder="Пароль">
-        <button onclick="register()">Реєстрація</button>
-    </div>
-
-    <div id="main-app" style="display: none;">
-        <button onclick="logout()">Вийти</button>
-    </div>
+   
 
     <!-- HEAD -->
     <header>
+        <button id="logoutBtn">Вийти</button>
         <div class="welcome">
             <h1 class="main-text">Planning Training <br class="break-main-text-1">and <br class="break-main-text-2">Nutrition</h1>
             <div class="main-btn-container">
@@ -138,73 +125,35 @@
             <h2>All Protein <br class="break-menu-sum"><span id="all-protein"></span> Grams</h2>
         </div>
     </section>
+        
+        
+   <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
-    <!-- JS -->
-    <script src="resources/js/index.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="resources/js/scroll.js"></script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBdfBlNOkb3z7o1ERMUHWWHiqsLrJVvVMg",
+    authDomain: "training-c1919.firebaseapp.com",
+    projectId: "training-c1919",
+    storageBucket: "training-c1919.appspot.com",
+    messagingSenderId: "537168879516",
+    appId: "1:537168879516:web:8639e7968434e7a5d8f259"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    <!-- Firebase Auth -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBdfBlNOkb3z7o1ERMUHWWHiqsLrJVvVMg",
-            authDomain: "training-c1919.firebaseapp.com",
-            projectId: "training-c1919",
-            storageBucket: "training-c1919.firebasestorage.app",
-            messagingSenderId: "537168879516",
-            appId: "1:537168879516:web:8639e7968434e7a5d8f259",
-            measurementId: "G-2X8WX08W7W"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const analytics = getAnalytics(app);
-
-        // Регистрация
-        window.register = () => {
-            const email = document.getElementById("registerEmail").value;
-            const password = document.getElementById("registerPassword").value;
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    console.log("Реєстрація успішна:", userCredential.user);
-                })
-                .catch((error) => {
-                    alert(error.message);
-                });
-        };
-
-        // Вход
-        window.login = () => {
-            const email = document.getElementById("loginEmail").value;
-            const password = document.getElementById("loginPassword").value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    console.log("Вхід успішний:", userCredential.user);
-                })
-                .catch((error) => {
-                    alert(error.message);
-                });
-        };
-
-        // Выход
-        window.logout = () => {
-            signOut(auth);
-        };
-
-        // Отслеживание авторизации
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById("auth-block").style.display = "none";
-                document.getElementById("main-app").style.display = "block";
-            } else {
-                document.getElementById("auth-block").style.display = "block";
-                document.getElementById("main-app").style.display = "none";
-            }
-        });
-    </script>
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    signOut(auth);
+  });
+</script>
+<script src="resources/js/index.js"></script>
+<script src="resources/js/scroll.js"></script>
+    
 </body>
 </html>
