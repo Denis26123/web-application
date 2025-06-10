@@ -1,23 +1,34 @@
-$(document).ready(function() {
-    
-    //click to scroll to sections
-    $('.js--scroll-to-schedule').click(function () {
-       $('html, body').animate({scrollTop: $('.js--schedule').offset().top}, 1000); 
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    const scrollToScheduleBtn = document.querySelector('.js--scroll-to-schedule');
+    const scrollToCaloriesBtn = document.querySelector('.js--scroll-to-calories');
+    const scrollToResultBtn = document.querySelector('.js--scroll-to-result');
+    const scrollToCalCalBtn = document.querySelector('.js--scroll-to-cal-cal');
 
-    $('.js--scroll-to-calories').click(function () {
-       $('html, body').animate({scrollTop: $('.js--calories').offset().top}, 1000); 
-    });
-    $('.js--scroll-to-result').click(function () {
-       setTimeout( function() {
-         $('html, body').animate({scrollTop: $('.js--schedule-result').offset().top}, 1000);
-       }, 500)    
-   });
+    if (scrollToScheduleBtn) {
+        scrollToScheduleBtn.addEventListener('click', () => {
+            document.querySelector('.js--schedule').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
 
-   $('.js--scroll-to-cal-cal').click(function () {
-      setTimeout( function() {
-        $('html, body').animate({scrollTop: $('.js--cal-cal').offset().top}, 1000);
-      }, 300)    
-  });
-   
+    if (scrollToCaloriesBtn) {
+        scrollToCaloriesBtn.addEventListener('click', () => {
+            document.querySelector('.js--calories').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    if (scrollToResultBtn) {
+        scrollToResultBtn.addEventListener('click', () => {
+            setTimeout(() => {
+                document.querySelector('.js--schedule-result').scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        });
+    }
+
+    if (scrollToCalCalBtn) {
+        scrollToCalCalBtn.addEventListener('click', () => {
+            setTimeout(() => {
+                document.querySelector('.js--cal-cal').scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        });
+    }
 });
