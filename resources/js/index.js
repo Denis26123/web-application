@@ -1,215 +1,301 @@
 
-//------------------//
-// Schedule Section //
-//------------------//
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
+import { getDatabase, ref, push, set, get, onValue } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js";
 
-function saveProfile() {
+/* -----------------------------------------------------------
+ *   Firebase INITIALISATION
+ * --------------------------------------------------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyBdfBlNOkb3z7o1ERMUHWWHiqsLrJVvVMg",
+  authDomain: "training-c1919.firebaseapp.com",
+  databaseURL:
+    "https://training-c1919-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "training-c1919",
+  storageBucket: "training-c1919.appspot.com",
+  messagingSenderId: "537168879516",
+  appId: "1:537168879516:web:8639e7968434e7a5d8f259",
+  measurementId: "G-2X8WX08W7W",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
+getAnalytics(app);
+
+// expose globals for inline onclick handlers
+window.auth = auth;
+window.database = database;
+window.logout = () => signOut(auth).then(() => (location.href = "login.html"));
+
+/* -----------------------------------------------------------
+ *  UTILITIES
+ * --------------------------------------------------------- */
+const $id = (id) => document.getElementById(id);
+
+/* -----------------------------------------------------------
+ *  AUTH LISTENER
+ * --------------------------------------------------------- */
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // redirect to login if signed out
+    location.href = "login.html";
+    return;
+  }
+
+  // show main UI
+  $id("main-app").style.display = "block";
+  // load history and build charts
+  loadUserHistory();
+});
+
+/* -----------------------------------------------------------
+ *  PROFILE
+ * --------------------------------------------------------- */
+window.saveProfile = function saveProfile() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const data = {
+    username: $id("username").value.trim(),
+    age: +$id("age").value,
+    height: +$id("height").value,
+    weight: +$id("weight").value,
+    goal: $id("goal").value,
+    timestamp: new Date().toISOString(),
     
-    const name = document.getElementById("username").value;
-    const age = document.getElementById("age").value;
-    const height = document.getElementById("height").value;
-    const weight = document.getElementById("weight").value;
-    const goal = document.getElementById("goal").value;
-
-    if (name && age && height && weight && goal) {
-        document.getElementById("res-username").textContent = name;
-        document.getElementById("res-age").textContent = age;
-        document.getElementById("res-height").textContent = height;
-        document.getElementById("res-weight").textContent = weight;
-        document.getElementById("res-goal").textContent = goal;
-
-        document.querySelector(".js--profile-result").style.display = "block";
-    } else {
-        alert("Please fill out all fields.");
-    }
-}
-
-let prev = ["mutable", "array"];
-
-const makeSchedule = () => {
-    setTimeout(() => {
-        planWorkout();
-    }, 100);
-}
-
-const planWorkout = () => {
-    let resultArray = [];
-
-    //make an array for the muscles that are checked on checkboxes.
-    const muscleArray = ['Chest','Back','Legs','Shoulder','Biceps','Triceps','Abs'];
-    let checkboxArray = document.querySelectorAll(".muscle-checkboxes input");
-    for (i=0;i<checkboxArray.length;i++) {
-        if (checkboxArray[i].checked == false) {
-            muscleArray.splice(muscleArray.indexOf(checkboxArray[i].id),1);
-        }
-    }
-
-    //number of muscle parts checked
-    const checkedNumber = muscleArray.length;
-    //In case that no muscle is checked
-    if (checkedNumber <= 0) {
-        alert("Please select at least one muscle");
-    }
-
-    //there is some muscle checked.
-    else {
-
-        let restOrNot = false;
-        
-        for (let i = 0; i < 7; i++) {
-
-            //when array is empty || rest is needed after big muscle day
-            if (muscleArray.length <= 0 || restOrNot == true) {
-                resultArray.push("<em>-rest-</em>");
-                restOrNot = false;
-            } 
-            
-            //when array is still not empty and no rest is needed.
-            else {
-
-                //for random which muscle to be on each day
-                let muscleRandom = Math.floor(Math.random()*muscleArray.length);
-
-                //1 Chest + Triceps
-                if (muscleArray[muscleRandom] == "Chest" && muscleArray.includes("Triceps") || muscleArray[muscleRandom] == "Triceps" && muscleArray.includes("Chest")) {
-                    resultArray.push("<strong>Chest + Triceps</strong>");
-                    muscleArray.splice(muscleArray.indexOf("Chest"),1);
-                    muscleArray.splice(muscleArray.indexOf("Triceps"),1);
-                    restOrNot = true; 
-                }
-                
-                //2 Back + Biceps
-                else if (muscleArray[muscleRandom] == "Back" && muscleArray.includes("Biceps") || muscleArray[muscleRandom] == "Biceps" && muscleArray.includes("Back")) {
-                    resultArray.push("<strong>Back + Biceps</strong>");
-                    muscleArray.splice(muscleArray.indexOf("Back"),1);
-                    muscleArray.splice(muscleArray.indexOf("Biceps"),1)
-                    restOrNot = true;
-                }    
-                
-                //3 Chest without Triceps || Back without Biceps || Legs Day
-                else if (muscleArray[muscleRandom] == "Chest" || muscleArray[muscleRandom] == "Back" || muscleArray[muscleRandom] == "Legs") {
-                    resultArray.push("<strong>" + muscleArray[muscleRandom] + "</strong>");
-                    muscleArray.splice(muscleArray.indexOf(muscleArray[muscleRandom]),1);
-                    restOrNot = true;
-             
-                }
-
-                //4 Shoulder + Abs
-                else if (muscleArray[muscleRandom] == "Shoulder" && muscleArray.includes("Abs") || muscleArray[muscleRandom] == "Abs" && muscleArray.includes("Shoulder")) {
-                    resultArray.push("<strong>Shoulder + Abs</strong>");
-                    muscleArray.splice(muscleArray.indexOf("Shoulder"),1);
-                    muscleArray.splice(muscleArray.indexOf("Abs"),1);
-                }
-
-                //5 everything else: Shoulder / Abs / Biceps / Triceps
-                else {
-                    resultArray.push("<strong>" + muscleArray[muscleRandom] + "</strong>");
-                    muscleArray.splice(muscleArray.indexOf(muscleArray[muscleRandom]),1);
-                }       
-            }
-        }
-
-
-        //if got the same result, run the function again!
-        const joinedPrev = prev.filter(x => x !== "<em>-rest-</em>").join("");;
-        const joinedResult = resultArray.filter(x => x !== "<em>-rest-</em>").join("");
-
-        prev = resultArray; // save for comparing in the next time
-        if (joinedPrev === joinedResult && checkedNumber >= 2) {
-            return planWorkout();
-        }
-
-        //change the first day of workout.
-        let allDaysInWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-        let firstDay = document.querySelector("#firstday").value;
-        let indexOfFirstDay = allDaysInWeek.indexOf(firstDay);
-        for (i=0;i<indexOfFirstDay;i++) {
-            resultArray.unshift(resultArray.pop());
-        }
-
-        //put the muscle that is re-arrayed by first day into <span></span>
-        let scheduleResultArray = document.querySelectorAll(".schedule-result span");
-        for (i=0;i<scheduleResultArray.length;i++) {
-            scheduleResultArray[i].innerHTML = resultArray[i];
-        }
-
-        //show the result 
-        document.querySelector(".schedule-result").style.display = "block";
-    }
-
-}
-
-//------------------//
-// Calories Section //
-//------------------//
-
-let foodArray = [];
-let counter = 0;
-let foodNote = "";
-
-const addFood = (e) => {
-    e.preventDefault();
-
-    //food name is not defined
-    if (document.querySelector("#food-name").value == "") {
-        alert("Please define the name of the menu");
-        return;
-    }
-
-    else {
-
-        //adding an element into foodArray with properties.
-        const nameInput = document.querySelector("#food-name").value;
-        const calInput = document.querySelector("#food-calories").value;
-        const proteinInput = document.querySelector("#food-protein").value;
-        foodArray[counter] = {};
-        foodArray[counter].name = nameInput;
-        foodArray[counter].calories = (calInput != "") ? parseInt(calInput) : 0;
-        foodArray[counter].protein = (proteinInput != "") ? parseInt(proteinInput) : 0;
-
-        //making a note of all food taken
-        foodNote = foodNote + "<strong>Menu:</strong> "+ foodArray[counter].name +
-        "  <br class='break-menu'><strong>Calories:</strong> " + foodArray[counter].calories +
-        " <strong>Protein:</strong> " + foodArray[counter].protein + "<br>";
-        document.querySelector(".food-note span").innerHTML = foodNote;
-
-        counter++
-
-        //clear the blank
-        const foodName = document.querySelector("#food-name")
-        foodName.value = "";
-        foodName.focus();
-        document.querySelector("#food-calories").value = "";    
-        document.querySelector("#food-protein").value = "";
-
-    }
-}
-
-// handle form submitting
-const calForm = document.querySelector(".cal-form")
-calForm.addEventListener("submit", addFood);
-
-//Clear everything
-const clearFood = () => {
-    foodArray = [];
-    counter = 0;
-    foodNote = "";
-    document.querySelector(".input-calories span").innerHTML = foodNote;
-    document.querySelector(".cal-cal").style.display = "none";
     
+  };
+
+  // basic validation
+  if (!data.username || !data.age || !data.height || !data.weight) {
+    alert("Please fill all profile fields!");
+    return;
+  }
+
+  set(ref(database, `users/${user.uid}/profile`), data)
+    .then(() => {
+      alert("Profile saved!");
+      loadUserHistory();
+      // update UI
+      ["username", "age", "height", "weight", "goal"].forEach((k) => {
+        $id(`res-${k}`).textContent = data[k];
+      });
+      document.querySelector(".profile-result").style.display = "block";
+    })
+    .catch((e) => console.error("Profile save error:", e));
+};
+
+/* -----------------------------------------------------------
+ *  SCHEDULE  (simple rotation logic)
+ * --------------------------------------------------------- */
+const MUSCLES = ["Chest", "Back", "Legs", "Shoulder", "Biceps", "Triceps", "Abs"];
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+window.makeSchedule = function makeSchedule() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  // collect checked muscles
+  const selected = MUSCLES.filter((m) => $id(m).checked);
+  if (!selected.length) {
+    alert("Select at least one muscle group!");
+    return;
+  }
+
+  // build schedule rotating selected muscles, rest on remaining days
+  const firstDay = $id("firstday").value;
+  const startIdx = DAYS.indexOf(firstDay);
+  const schedule = {};
+  // --- новый цикл формирует расписание ---
+let musIndex = 0;                                // счётчик выбранных мышц
+for (let i = 0; i < 7; i++) {
+  const dayName = DAYS[(startIdx + i) % 7];
+
+  if (musIndex < selected.length) {              // пока есть мышцы — ставим их
+    schedule[dayName] = selected[musIndex];
+    musIndex++;
+  } else {                                       // остальные дни – Rest
+    schedule[dayName] = "Rest";
+  }
+
+  $id(dayName).textContent = " " + schedule[dayName];
 }
 
-//calculate all the calories and protein intake
-const calCal = () => {
-let allCalories = 0;
-let allProtein = 0;
-    for (i=0;i<foodArray.length;i++) {
-        allCalories = allCalories + foodArray[i].calories;
-        allProtein = allProtein + foodArray[i].protein;
-    }
-    document.querySelector("#all-calories").innerHTML = allCalories;
-    document.querySelector("#all-protein").innerHTML = allProtein;
-    document.querySelector(".cal-cal").style.display = "block";
+
+  document.querySelector(".js--schedule-result").style.display = "block";
+
+  // push to DB
+  push(ref(database, `users/${user.uid}/schedules`), {
+    schedule,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+/* -----------------------------------------------------------
+ *  CALORIES
+ * --------------------------------------------------------- */
+const foodLog = [];
+
+function pushFoodToDB(name, calories, protein) {
+  const user = auth.currentUser;
+  if (!user) return;
+  push(ref(database, `users/${user.uid}/foods`), {
+    name,
+    calories,
+    protein,
+    timestamp: new Date().toISOString(),
+  });
 }
 
+window.addFood = function addFood(e) {
+  e.preventDefault();
+  const name = $id("food-name").value.trim();
+  const calories = +$id("food-calories").value || 0;
+  const protein = +$id("food-protein").value || 0;
 
+  if (!name) {
+    alert("Enter food name!");
+    return;
+  }
+
+  foodLog.push({ name, calories, protein });
+  pushFoodToDB(name, calories, protein);
+
+  document.querySelector(".food-note span").innerHTML += `${name} – ${calories} cals, ${protein} g protein<br>`;
+  ["food-name", "food-calories", "food-protein"].forEach((id) => ($id(id).value = ""));
+};
+
+window.clearFood = () => {
+  foodLog.length = 0;
+  document.querySelector(".food-note span").innerHTML = "";
+  document.querySelector(".cal-cal").style.display = "none";
+};
+
+window.calCal = () => {
+  const totalCals = foodLog.reduce((t, f) => t + f.calories, 0);
+  const totalProt = foodLog.reduce((t, f) => t + f.protein, 0);
+  $id("all-calories").textContent = totalCals;
+  $id("all-protein").textContent = totalProt;
+  document.querySelector(".cal-cal").style.display = "block";
+};
+
+document.querySelector(".cal-form").addEventListener("submit", window.addFood);
+
+/* -----------------------------------------------------------
+ *  PROGRESS
+ * --------------------------------------------------------- */
+window.saveProgress = function saveProgress() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const date = $id("progress-date").value;
+  const weight = +$id("progress-weight").value;
+
+  if (!date || !weight) {
+    alert("Enter date and weight!");
+    return;
+  }
+
+  push(ref(database, `users/${user.uid}/progress`), { date, weight });
+  $id("progress-date").value = "";
+  $id("progress-weight").value = "";
+};
+
+$id("progress-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  window.saveProgress();
+});
+
+/* -----------------------------------------------------------
+ *  HISTORY + CHART
+ * --------------------------------------------------------- */
+function renderProgressChart(uid) {
+  onValue(ref(database, `users/${uid}/progress`), (snap) => {
+    const arr = [];
+    snap.forEach((c) => arr.push(c.val()));
+    arr.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const labels = arr.map((i) => i.date);
+    const weights = arr.map((i) => i.weight);
+
+    if (window.progressChart) window.progressChart.destroy();
+
+    const ctx = document.getElementById("progressChart").getContext("2d");
+    window.progressChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Weight (kg)",
+            data: weights,
+            fill: false,
+            tension: 0.1,
+          },
+        ],
+      },
+    });
+  });
+}
+
+function loadUserHistory() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const uid = user.uid;
+
+  // Profile ─ выводим локальную дату-время
+get(ref(database, `users/${uid}/profile`)).then((snap) => {
+  if (snap.exists()) {
+    const d  = snap.val();
+    const tb = document.querySelector("#profile-history tbody");
+    tb.innerHTML = `<tr>
+      <td>${new Date(d.timestamp).toLocaleString()}</td>
+      <td>${d.username}</td><td>${d.age}</td><td>${d.height}</td>
+      <td>${d.weight}</td><td>${d.goal}</td>
+    </tr>`;
+  }
+});
+
+// Foods ─ каждая строка с локальной датой-временем
+onValue(ref(database, `users/${uid}/foods`), (snap) => {
+  const tb = document.querySelector("#food-history tbody");
+  tb.innerHTML = "";
+  snap.forEach((c) => {
+    const f  = c.val();
+    const ts = new Date(f.timestamp).toLocaleString();
+    tb.innerHTML += `<tr>
+      <td>${ts}</td><td>${f.name}</td>
+      <td>${f.calories}</td><td>${f.protein}</td>
+    </tr>`;
+  });
+});
+
+// Schedules ─ первая ячейка с форматированной датой
+onValue(ref(database, `users/${uid}/schedules`), (snap) => {
+  const tb = document.querySelector("#schedule-history tbody");
+  tb.innerHTML = "";
+  snap.forEach((c) => {
+    const s  = c.val();
+    const ts = new Date(s.timestamp).toLocaleString();
+    const row = `<tr><td>${ts}</td>` +
+      DAYS.map((d) => `<td>${s.schedule[d] ?? ""}</td>`).join("") +
+      "</tr>";
+    tb.innerHTML += row;
+  });
+});
+
+
+  // Progress chart
+  renderProgressChart(uid);
+}
+function wipe(path){
+  const u=auth.currentUser; if(!u) return;
+  set(ref(database,`users/${u.uid}/${path}`),null);
+}
+window.clearProfileHistory = ()=>{wipe("profile"  ); document.querySelector("#profile-history tbody").innerHTML="";};
+window.clearFoodHistory    = ()=>{wipe("foods"    ); document.querySelector("#food-history tbody").innerHTML="";};
+window.clearScheduleHistory= ()=>{wipe("schedules"); document.querySelector("#schedule-history tbody").innerHTML="";};
+
+// export for debugging
+window.loadUserHistory = loadUserHistory;
